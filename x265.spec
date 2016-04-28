@@ -7,6 +7,7 @@
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
+Group:		Applications/Multimedia
 Version: 	1.9
 Release: 	1%{?gver}%{?dist}
 URL: 		http://x265.org/
@@ -26,6 +27,7 @@ This package contains the command line encoder.
 
 %package libs
 Summary: H.265/HEVC encoder library
+Group: Development/Libraries
 
 %description libs
 The primary objective of x265 is to become the best H.265/HEVC encoder
@@ -36,6 +38,7 @@ This package contains the shared library.
 
 %package devel
 Summary: H.265/HEVC encoder library development files
+Group: Development/Libraries
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
@@ -108,6 +111,10 @@ cd build-8
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_libdir}/libx265.a
 install -Dpm644 %{_builddir}/%{name}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
+
+%post libs -p /sbin/ldconfig
+
+%postun libs -p /sbin/ldconfig
 
 %files
 %{_bindir}/x265

@@ -61,7 +61,7 @@ mkdir -p build-8 build-10 build-12
 %build
 
 %ifarch x86_64
-cd build-12
+pushd build-12
     cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DHIGH_BIT_DEPTH='TRUE' \
@@ -70,9 +70,9 @@ cd build-12
       -DENABLE_CLI='FALSE' \
       -DENABLE_SHARED='FALSE'
     make
+popd
 
-    cd ../build-10
-
+    pushd build-10
     cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DHIGH_BIT_DEPTH='TRUE' \
@@ -80,9 +80,9 @@ cd build-12
       -DENABLE_CLI='FALSE' \
       -DENABLE_SHARED='FALSE'
     make
+popd
 
-    cd ../build-8
-
+    pushd build-8
     ln -s ../build-10/libx265.a libx265_main10.a
     ln -s ../build-12/libx265.a libx265_main12.a
 
@@ -94,10 +94,11 @@ cd build-12
       -DLINKED_10BIT='TRUE' \
       -DLINKED_12BIT='TRUE'
     make
+popd
 
 %else
 
-    cd ../build-8
+    pushd build-8
 
     cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
@@ -107,7 +108,7 @@ cd build-12
 
 %install
 
-cd build-8
+pushd build-8
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_libdir}/libx265.a
 install -Dpm644 %{_builddir}/%{name}/COPYING %{buildroot}%{_pkgdocdir}/COPYING

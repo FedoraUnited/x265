@@ -9,7 +9,7 @@ Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
 Version: 	1.9
-Release: 	1%{?gver}%{?dist}
+Release: 	2%{?gver}%{?dist}
 URL: 		http://x265.org/
 Source0: 	%{name}-%{version}-%{snapshot}.tar.xz
 Source1: 	%{name}-snapshot.sh
@@ -134,7 +134,10 @@ install -Dpm644 %{_builddir}/%{name}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
 
 %changelog
 
-* Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-20160221-40ba1eb-1
+* Fri Jul 08 2016 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-2-20160221git40ba1eb
+- Massive rebuild
+
+* Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-1-20160221git40ba1eb
 - Updated to 1.9-20160221-40ba1eb
 
 * Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.7-1

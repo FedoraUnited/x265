@@ -2,7 +2,7 @@
  
 Summary: 	H.265/HEVC encoder
  
-Version: 	1.9
+Version: 	2.2
  
 License: 	GPLv2+ and BSD
  

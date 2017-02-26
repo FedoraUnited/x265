@@ -1,17 +1,16 @@
-# globals for x265-1.9-20160221-40ba1eb.tar.xz
-%global gitdate 20160221
-%global gitversion 40ba1eb
-%global snapshot %{gitdate}-%{gitversion}
-%global gver .%{gitdate}git%{gitversion}
+%global gitdate 20170226
+%global commit0 3daed96a7d8f409c8e30e1226122ab4935561173
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+%global gver .%{gitdate}git%{shortcommit0}
 
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	1.9
+Version: 	2.2
 Release: 	2%{?gver}%{?dist}
 URL: 		http://x265.org/
-Source0: 	%{name}-%{version}-%{snapshot}.tar.xz
+Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 Source1: 	%{name}-snapshot.sh
 License: 	GPLv2+ and BSD
 BuildRequires: 	cmake
@@ -49,7 +48,7 @@ highest performance on a wide variety of hardware platforms.
 This package contains the shared library development files.
 
 %prep
-%setup -n %{name}
+%autosetup -n x265-%{commit0} 
 
 %ifarch x86_64
 sed -i 's|set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")|set(LIB_INSTALL_DIR lib64 CACHE STRING "Install location of libraries")|g' source/CMakeLists.txt
@@ -111,7 +110,7 @@ popd
 pushd build-8
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_libdir}/libx265.a
-install -Dpm644 %{_builddir}/%{name}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
+install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
 
 %post libs -p /sbin/ldconfig
 
@@ -133,6 +132,9 @@ install -Dpm644 %{_builddir}/%{name}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Sun Feb 26 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.2-2-20170226git3daed96
+- Updated to 2.2-2-20170226git3daed96
 
 * Fri Jul 08 2016 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-2-20160221git40ba1eb
 - Massive rebuild

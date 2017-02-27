@@ -61,7 +61,7 @@ mkdir -p build-8 build-10 build-12
 
 %ifarch x86_64
 pushd build-12
-    cmake ../source \
+    %cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DMAIN12='TRUE' \
@@ -72,7 +72,7 @@ pushd build-12
 popd
 
     pushd build-10
-    cmake ../source \
+    %cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DEXPORT_C_API='FALSE' \
@@ -85,7 +85,7 @@ popd
     ln -s ../build-10/libx265.a libx265_main10.a
     ln -s ../build-12/libx265.a libx265_main12.a
 
-    cmake ../source \
+    %cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DENABLE_SHARED='TRUE' \
       -DEXTRA_LIB='x265_main10.a;x265_main12.a' \
@@ -99,7 +99,7 @@ popd
 
     pushd build-8
 
-    cmake ../source \
+    %cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DENABLE_SHARED='TRUE'
 

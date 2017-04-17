@@ -1,5 +1,5 @@
-%global gitdate 20170226
-%global commit0 3daed96a7d8f409c8e30e1226122ab4935561173
+%global gitdate 20170417
+%global commit0 97492ac96294105ecc321b5bd6802e599da24baf
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gver .%{gitdate}git%{shortcommit0}
 
@@ -7,7 +7,7 @@
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	2.2
+Version: 	2.3
 Release: 	2%{?gver}%{?dist}
 URL: 		http://x265.org/
 Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
@@ -132,6 +132,9 @@ install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Mon Apr 17 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.3-2-20170417git97492ac
+- Updated to 2.3-2-20170417git97492ac
 
 * Sun Feb 26 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.2-2-20170226git3daed96
 - Updated to 2.2-2-20170226git3daed96

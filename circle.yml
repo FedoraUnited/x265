@@ -1,0 +1,23 @@
+machine:
+#  python:
+#    version: 2.7.13
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - sudo apt-get update 
+
+test:
+  override:
+    - docker run -v $(pwd):/root/enjoy davidva/unibuild-24 /bin/sh urpms -g UnitedRPMs/x265  -s x265.spec -r true -d 'dist .fc24' -c true -u true:
+        parallel: true
+        timeout: 9600
+
+    - docker run -v $(pwd):/root/enjoy davidva/unibuild /bin/sh urpms -g UnitedRPMs/x265  -s x265.spec -r true -d 'dist .fc25' -c true -u true:
+        parallel: true
+        timeout: 9600
+
+        
+
+

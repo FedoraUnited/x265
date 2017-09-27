@@ -1,13 +1,13 @@
-%global gitdate 20170525
-%global commit0 b2d3ae409939ae2d04fa9e6046aa1e03a063aa43
+%global gitdate 20170926
+%global commit0 e8a6c75979f4f446e9d338d3c06972cb5706aab6
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global gver .%{gitdate}git%{shortcommit0}
+%global gver .git%{shortcommit0}
 
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	2.4
+Version: 	2.5
 Release: 	2%{?gver}%{?dist}
 URL: 		http://x265.org/
 Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
@@ -133,19 +133,22 @@ install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir
 
 %changelog
 
+* Tue Sep 26 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.5-2.gite8a6c75
+- Updated to 2.5-2.gite8a6c75
+
 * Thu May 25 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.4-2.gitb2d3ae4
 - Updated to 2.4-2.gitb2d3ae4
 
-* Mon Apr 17 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.3-2-20170417git97492ac
+* Mon Apr 17 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.3-2.git97492ac
 - Updated to 2.3-2-20170417git97492ac
 
-* Sun Feb 26 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.2-2-20170226git3daed96
+* Sun Feb 26 2017 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.2-2.git3daed96
 - Updated to 2.2-2-20170226git3daed96
 
-* Fri Jul 08 2016 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-2-20160221git40ba1eb
+* Fri Jul 08 2016 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-2.git40ba1eb
 - Massive rebuild
 
-* Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-1-20160221git40ba1eb
+* Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.9-1.git40ba1eb
 - Updated to 1.9-20160221-40ba1eb
 
 * Tue Jul 14 2015 David Vásquez <davidjeremias82 AT gmail DOT com> - 1.7-1

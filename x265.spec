@@ -8,9 +8,10 @@ Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
 Version: 	2.7
-Release: 	2%{?gver}%{?dist}
+Release: 	3%{?gver}%{?dist}
 URL: 		http://x265.org/
 Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+Patch:		pkgconfig_fix.patch
 License: 	GPLv2+ and BSD
 BuildRequires: 	cmake
 BuildRequires: 	yasm
@@ -47,7 +48,7 @@ highest performance on a wide variety of hardware platforms.
 This package contains the shared library development files.
 
 %prep
-%autosetup -n x265-%{commit0} 
+%autosetup -n x265-%{commit0} -p1
 
 %ifarch x86_64
 sed -i 's|set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")|set(LIB_INSTALL_DIR lib64 CACHE STRING "Install location of libraries")|g' source/CMakeLists.txt
@@ -131,6 +132,9 @@ install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Sun Apr 15 2018 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.7-3.git56b216f
+- Devel package fix
 
 * Wed Feb 21 2018 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.7-2.git56b216f
 - Updated to 2.7-2.git56b216f

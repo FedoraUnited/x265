@@ -1,5 +1,5 @@
 %global gitdate 20180221
-%global commit0 56b216f063b38bb10b61ae8452a452dd8534659e
+%global commit0 ba0d009aa5a9bee3cd2e2326ecf814bd557d83a4
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gver .git%{shortcommit0}
 
@@ -7,7 +7,7 @@
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	2.7
+Version: 	2.8
 Release: 	3%{?gver}%{?dist}
 URL: 		http://x265.org/
 Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
@@ -132,6 +132,9 @@ install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Tue May 22 2018 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.8-3.gitba0d009
+- Updated to 2.8-3.gitba0d009
 
 * Sun Apr 15 2018 David Vásquez <davidjeremias82 AT gmail DOT com> - 2.7-3.git56b216f
 - Devel package fix

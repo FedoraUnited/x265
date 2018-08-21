@@ -16,6 +16,7 @@ License: 	GPLv2+ and BSD
 BuildRequires: 	cmake
 BuildRequires: 	yasm
 BuildRequires: 	git
+BuildRequires:  gcc-c++
 
 %description
 The primary objective of x265 is to become the best H.265/HEVC encoder

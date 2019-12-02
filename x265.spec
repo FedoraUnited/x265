@@ -1,22 +1,21 @@
-%global gitdate 20190802
-%global commit0 15309c08683b81bb86a7b3bfcf492d6baa72af69
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+%global gitdate 20191201
+%global commit0 b5c86a64bbbede216b25092def72272ecde5523a
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:12})  
 %global gver .git%{shortcommit0}
 
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	3.1.2
+Version: 	3.2.1
 Release: 	7%{?dist}
 URL: 		http://x265.org/
-Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+Source0:	https://bitbucket.org/multicoreware/x265/get/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 Patch:		pkgconfig_fix.patch
 License: 	GPLv2+ and BSD
-BuildRequires: 	cmake
-BuildRequires: 	yasm
-BuildRequires: 	git
-BuildRequires:  gcc-c++
+BuildRequires:	cmake
+BuildRequires:	yasm
+BuildRequires:	gcc-c++
 
 %description
 The primary objective of x265 is to become the best H.265/HEVC encoder
@@ -49,7 +48,7 @@ highest performance on a wide variety of hardware platforms.
 This package contains the shared library development files.
 
 %prep
-%autosetup -n x265-%{commit0} -p1
+%autosetup -n multicoreware-%{name}-%{shortcommit0} -p1
 
 %ifarch x86_64
 sed -i 's|set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")|set(LIB_INSTALL_DIR lib64 CACHE STRING "Install location of libraries")|g' source/CMakeLists.txt
@@ -111,7 +110,7 @@ popd
 pushd build-8
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_libdir}/libx265.a
-install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
+install -Dpm644 %{_builddir}/multicoreware-%{name}-%{shortcommit0}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
 
 %post libs -p /sbin/ldconfig
 
@@ -133,6 +132,9 @@ install -Dpm644 %{_builddir}/%{name}-%{commit0}/COPYING %{buildroot}%{_pkgdocdir
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Sun Dec 01 2019 David Va <davidva AT tuta DOT io> - 3.2.1-7
+- Updated to 3.2.1-7
 
 * Fri Aug 02 2019 David Vásquez <davidjeremias82 AT gmail DOT com> - 3.1.2-7
 - Updated to 3.1.2-7

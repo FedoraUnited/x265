@@ -1,5 +1,5 @@
 %global gitdate 20200217
-%global commit0 f94b0d32737d40b2b9a9d74df57fee45e6be5cb0
+%global commit0 7b120308dc64616cb5ef8de3bc3ee617f00803d9
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:12})  
 %global gver .git%{shortcommit0}
 
@@ -7,7 +7,7 @@
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	3.3
+Version: 	3.4
 Release: 	7%{?dist}
 URL: 		http://x265.org/
 Source0:	https://bitbucket.org/multicoreware/x265/get/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
@@ -132,6 +132,9 @@ install -Dpm644 %{_builddir}/multicoreware-%{name}-%{shortcommit0}/COPYING %{bui
 %{_libdir}/pkgconfig/x265.pc
 
 %changelog
+
+* Sat May 30 2020 David Va <davidva AT tuta DOT io> - 3.4-7
+- Updated to 3.4
 
 * Tue Feb 18 2020 David Va <davidva AT tuta DOT io> - 3.3-7
 - Updated to 3.3-7

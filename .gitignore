@@ -6,3 +6,4 @@ SRPMS/*
 x265*.tar.gz
 x265*.tar.xz
 .directory
+*.rpm

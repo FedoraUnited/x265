@@ -1,8 +1,9 @@
 %global gitdate 20200217
-%global commit0 7b120308dc64616cb5ef8de3bc3ee617f00803d9
+%global commit0 07295ba7ab551bb9c1580fdaee3200f1b45711b7
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:12})  
 %global gver .git%{shortcommit0}
 
+%global debug_package %{nil}
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
@@ -10,7 +11,7 @@ Group:		Applications/Multimedia
 Version: 	3.4
 Release: 	7%{?dist}
 URL: 		http://x265.org/
-Source0:	https://bitbucket.org/multicoreware/x265/get/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 Patch:		pkgconfig_fix.patch
 License: 	GPLv2+ and BSD
 BuildRequires:	cmake
@@ -48,7 +49,7 @@ highest performance on a wide variety of hardware platforms.
 This package contains the shared library development files.
 
 %prep
-%autosetup -n multicoreware-%{name}-%{shortcommit0} -p1
+%autosetup -n %{name}-%{commit0} -p1
 
 %ifarch x86_64
 sed -i 's|set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")|set(LIB_INSTALL_DIR lib64 CACHE STRING "Install location of libraries")|g' source/CMakeLists.txt
@@ -61,8 +62,9 @@ mkdir -p build-8 build-10 build-12
 
 %ifarch x86_64
 pushd build-12
-    %cmake ../source \
+    cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DMAIN12='TRUE' \
       -DEXPORT_C_API='FALSE' \
@@ -72,8 +74,9 @@ pushd build-12
 popd
 
     pushd build-10
-    %cmake ../source \
+    cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DEXPORT_C_API='FALSE' \
       -DENABLE_CLI='FALSE' \
@@ -85,8 +88,9 @@ popd
     ln -s ../build-10/libx265.a libx265_main10.a
     ln -s ../build-12/libx265.a libx265_main12.a
 
-    %cmake ../source \
+    cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DENABLE_SHARED='TRUE' \
       -DEXTRA_LIB='x265_main10.a;x265_main12.a' \
       -DEXTRA_LINK_FLAGS='-L.' \
@@ -99,7 +103,7 @@ popd
 
     pushd build-8
 
-    %cmake ../source \
+    cmake ../source \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DENABLE_SHARED='TRUE'
 
@@ -110,7 +114,7 @@ popd
 pushd build-8
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_libdir}/libx265.a
-install -Dpm644 %{_builddir}/multicoreware-%{name}-%{shortcommit0}/COPYING %{buildroot}%{_pkgdocdir}/COPYING
+
 
 %post libs -p /sbin/ldconfig
 
@@ -120,8 +124,7 @@ install -Dpm644 %{_builddir}/multicoreware-%{name}-%{shortcommit0}/COPYING %{bui
 %{_bindir}/x265
 
 %files libs
-%dir %{_pkgdocdir}
-%{_pkgdocdir}/COPYING
+%license COPYING
 %{_libdir}/libx265.so.*
 
 %files devel

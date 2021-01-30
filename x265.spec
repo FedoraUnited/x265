@@ -1,5 +1,5 @@
 %global gitdate 20200217
-%global commit0 07295ba7ab551bb9c1580fdaee3200f1b45711b7
+%global commit0 73a186aeb0c3bba8c6a773eadc2491bdb3bda0ac
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:12})  
 %global gver .git%{shortcommit0}
 
@@ -9,14 +9,20 @@ Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
 Version: 	3.4
-Release: 	7%{?dist}
+Release: 	8%{?dist}
 URL: 		http://x265.org/
-Source0:	https://github.com/videolan/x265/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+Source0:	https://github.com/videolan/x265/archive/%{commit0}.zip#/%{name}-%{shortcommit0}.tar.gz
 Patch:		pkgconfig_fix.patch
+# fix building as PIC
+Patch1:		%{name}-pic.patch
+Patch2:		%{name}-high-bit-depth-soname.patch
+Patch3:		%{name}-detect_cpu_armhfp.patch
+Patch4:		%{name}-arm-cflags.patch
 License: 	GPLv2+ and BSD
-BuildRequires:	cmake
-BuildRequires:	yasm
+BuildRequires:	cmake3
+BuildRequires:	nasm
 BuildRequires:	gcc-c++
+BuildRequires:  numactl-devel
 
 %description
 The primary objective of x265 is to become the best H.265/HEVC encoder
@@ -62,79 +68,103 @@ mkdir -p build-8 build-10 build-12
 
 %ifarch x86_64
 pushd build-12
-    cmake ../source \
+mkdir -p build
+    %cmake ../source -B build \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DMAIN12='TRUE' \
       -DEXPORT_C_API='FALSE' \
       -DENABLE_CLI='FALSE' \
-      -DENABLE_SHARED='FALSE'
-    make
+      -DENABLE_SHARED='TRUE' \
+      -Wno-dev 
+      
+    make -C build
 popd
 
     pushd build-10
-    cmake ../source \
+    mkdir -p build
+    %cmake ../source -B build \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
       -DEXPORT_C_API='FALSE' \
       -DENABLE_CLI='FALSE' \
-      -DENABLE_SHARED='FALSE'
-    make
+      -DENABLE_SHARED='TRUE' \
+      -Wno-dev 
+    make -C build
 popd
 
     pushd build-8
-    ln -s ../build-10/libx265.a libx265_main10.a
-    ln -s ../build-12/libx265.a libx265_main12.a
+    mkdir -p build
 
-    cmake ../source \
-      -DCMAKE_INSTALL_PREFIX='/usr' \
-      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
-      -DENABLE_SHARED='TRUE' \
-      -DEXTRA_LIB='x265_main10.a;x265_main12.a' \
-      -DEXTRA_LINK_FLAGS='-L.' \
-      -DLINKED_10BIT='TRUE' \
-      -DLINKED_12BIT='TRUE'
-    make
+    %cmake ../source -B build \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_SKIP_RPATH=YES \
+    -DENABLE_PIC=ON \
+    -DENABLE_SHARED=ON \
+    -DENABLE_HDR10_PLUS='TRUE' \
+    -Wno-dev 
+
+    make -C build
 popd
 
 %else
 
     pushd build-8
-
-    cmake ../source \
+    mkdir -p build
+    %cmake ../source -B build \
       -DCMAKE_INSTALL_PREFIX='/usr' \
-      -DENABLE_SHARED='TRUE'
-
+      -DENABLE_SHARED='TRUE' \
+      -DENABLE_HDR10_PLUS='TRUE' \
+      -Wno-dev
+    make -C build
 %endif
 
 %install
 
-pushd build-8
-make DESTDIR=%{buildroot} install
-rm %{buildroot}%{_libdir}/libx265.a
+for b in 8 10 12; do
+    if [ -d build-${b}/build ]; then
+        pushd build-${b}
+            %make_install -C build
+            # Remove unversioned library, should not be linked to
+            rm -f %{buildroot}%{_libdir}/libx265_main${b}.so
+        popd
+    fi
+done
+
+if [ ! -f %{buildroot}/%{_bindir}/x265 ]; then
+mkdir -p %{buildroot}/%{_bindir} && cp -f build-8/build/x265 %{buildroot}/%{_bindir}/
+fi
+
+# maybe we need a static in the future
+find %{buildroot} -name "*.a" -delete
 
 
-%post libs -p /sbin/ldconfig
-
-%postun libs -p /sbin/ldconfig
+%ldconfig_scriptlets libs
 
 %files
 %{_bindir}/x265
 
 %files libs
 %license COPYING
-%{_libdir}/libx265.so.*
+%{_libdir}/libhdr10plus.so
+%{_libdir}/lib%{name}.so.*
+%{_libdir}/lib%{name}_main10.so.*
+%{_libdir}/lib%{name}_main12.so.*
 
 %files devel
 %doc doc/*
-%{_includedir}/x265.h
-%{_includedir}/x265_config.h
-%{_libdir}/libx265.so
-%{_libdir}/pkgconfig/x265.pc
+%{_includedir}/hdr10plus.h
+%{_includedir}/%{name}.h
+%{_includedir}/%{name}_config.h
+%{_libdir}/lib%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+
+* Fri Jan 29 2021 David Va <davidva AT tuta DOT io> - 3.4-8
+- Updated to current commit stable
 
 * Sat May 30 2020 David Va <davidva AT tuta DOT io> - 3.4-7
 - Updated to 3.4

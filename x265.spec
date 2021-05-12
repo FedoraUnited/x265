@@ -1,17 +1,17 @@
-%global gitdate 20200217
-%global commit0 73a186aeb0c3bba8c6a773eadc2491bdb3bda0ac
+%global commit0 f0c1022b6be121a753ff02853fbe33da71988656
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:12})  
 %global gver .git%{shortcommit0}
 
 %global debug_package %{nil}
+%global api_version 199
 
 Summary: 	H.265/HEVC encoder
 Name: 		x265
 Group:		Applications/Multimedia
-Version: 	3.4
-Release: 	8%{?dist}
+Version: 	3.5
+Release: 	7%{?dist}
 URL: 		http://x265.org/
-Source0:	https://github.com/videolan/x265/archive/%{commit0}.zip#/%{name}-%{shortcommit0}.tar.gz
+Source0:	https://bitbucket.org/multicoreware/x265_git/downloads/x265_%{version}.tar.gz
 Patch:		pkgconfig_fix.patch
 # fix building as PIC
 Patch1:		%{name}-pic.patch
@@ -23,6 +23,7 @@ BuildRequires:	cmake3
 BuildRequires:	nasm
 BuildRequires:	gcc-c++
 BuildRequires:  numactl-devel
+BuildRequires:	ninja-build
 
 %description
 The primary objective of x265 is to become the best H.265/HEVC encoder
@@ -55,7 +56,7 @@ highest performance on a wide variety of hardware platforms.
 This package contains the shared library development files.
 
 %prep
-%autosetup -n %{name}-%{commit0} -p1
+%autosetup -n %{name}_%{version} -p1
 
 %ifarch x86_64
 sed -i 's|set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")|set(LIB_INSTALL_DIR lib64 CACHE STRING "Install location of libraries")|g' source/CMakeLists.txt
@@ -69,7 +70,9 @@ mkdir -p build-8 build-10 build-12
 %ifarch x86_64
 pushd build-12
 mkdir -p build
-    %cmake ../source -B build \
+    %cmake  -B build \
+      -S %{_builddir}/%{name}_%{version}/source \
+      -G Ninja \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
@@ -79,12 +82,14 @@ mkdir -p build
       -DENABLE_SHARED='TRUE' \
       -Wno-dev 
       
-    make -C build
+    %ninja_build -C build
 popd
 
     pushd build-10
     mkdir -p build
-    %cmake ../source -B build \
+    %cmake -B build \
+      -S %{_builddir}/%{name}_%{version}/source \
+      -G Ninja \
       -DCMAKE_INSTALL_PREFIX='/usr' \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DHIGH_BIT_DEPTH='TRUE' \
@@ -92,46 +97,56 @@ popd
       -DENABLE_CLI='FALSE' \
       -DENABLE_SHARED='TRUE' \
       -Wno-dev 
-    make -C build
+    %ninja_build -C build -j2
 popd
 
     pushd build-8
     mkdir -p build
-
-    %cmake ../source -B build \
+    %cmake -B build \
+    -S %{_builddir}/%{name}_%{version}/source \
+    -G Ninja \
+    -DCMAKE_INSTALL_PREFIX='/usr' \
+    -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_SKIP_RPATH=YES \
     -DENABLE_PIC=ON \
     -DENABLE_SHARED=ON \
     -DENABLE_HDR10_PLUS='TRUE' \
+    -DGIT_ARCHETYPE="1" \
+    -DENABLE_ASSEMBLY=ON \
     -Wno-dev 
 
-    make -C build
+    %ninja_build -C build -j2
 popd
 
 %else
 
     pushd build-8
     mkdir -p build
-    %cmake ../source -B build \
+    %cmake  -B build \
+      -S %{_builddir}/%{name}_%{version}/source \
+      -G Ninja \
       -DCMAKE_INSTALL_PREFIX='/usr' \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DENABLE_SHARED='TRUE' \
       -DENABLE_HDR10_PLUS='TRUE' \
       -Wno-dev
-    make -C build
+      
+    %ninja_build -C build -j2
+    popd
 %endif
 
 %install
+pushd build-8
+  %ninja_install -C build
+  cp -n $PWD/build/libx265.so* %{buildroot}%{_libdir}/
+popd
 
-for b in 8 10 12; do
-    if [ -d build-${b}/build ]; then
-        pushd build-${b}
-            %make_install -C build
-            # Remove unversioned library, should not be linked to
-            rm -f %{buildroot}%{_libdir}/libx265_main${b}.so
-        popd
-    fi
-done
+install -m 0755 -p \
+  build-12/build/libx265_main12.so.%{api_version} \
+  build-10/build/libx265_main10.so.%{api_version} \
+  %{buildroot}%{_libdir}
+
 
 if [ ! -f %{buildroot}/%{_bindir}/x265 ]; then
 mkdir -p %{buildroot}/%{_bindir} && cp -f build-8/build/x265 %{buildroot}/%{_bindir}/
@@ -149,9 +164,11 @@ find %{buildroot} -name "*.a" -delete
 %files libs
 %license COPYING
 %{_libdir}/libhdr10plus.so
-%{_libdir}/lib%{name}.so.*
-%{_libdir}/lib%{name}_main10.so.*
-%{_libdir}/lib%{name}_main12.so.*
+%{_libdir}/lib%{name}.so.%{api_version}
+%ifarch x86_64 aarch64
+%{_libdir}/lib%{name}_main10.so.%{api_version}
+%{_libdir}/lib%{name}_main12.so.%{api_version}
+%endif
 
 %files devel
 %doc doc/*
@@ -162,6 +179,9 @@ find %{buildroot} -name "*.a" -delete
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+
+* Sat May 08 2021 David Va <davidva AT tuta DOT io> - 3.5-7
+- Updated to 3.5
 
 * Fri Jan 29 2021 David Va <davidva AT tuta DOT io> - 3.4-8
 - Updated to current commit stable
